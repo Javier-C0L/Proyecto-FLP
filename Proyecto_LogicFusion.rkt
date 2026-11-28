@@ -1357,3 +1357,72 @@
   )
 )
 
+;; =============================================================================
+;; Prueba del flujo de control y de los procedimientos.
+;; Las comparaciones van entre paréntesis porque así está el binario.
+;;
+;; Ejecutar:
+;; (execute-logicfusion prueba-flujo)
+
+(define prueba-flujo
+  "GLOBALS {
+    int n = 5;
+    int i = 0;
+    int acc = 0;
+    int a = 7;
+    function duplicar = lambda (int z) { return (z * 2) };
+  }
+  PROGRAM {
+    proc factorial (int x) {
+      return if ((x == 0)) { 1 } else { (x * factorial((x - 1))) }
+    }
+
+    proc cambiar (int x) {
+      return BLOCK {
+        x -> 0;
+        x
+      }
+    }
+
+    proc suma-local (int base) {
+      return LOCALS {
+        proc suma = lambda (int y) { return (y + base) };
+      } {
+        suma(10)
+      }
+    }
+
+    proc main () {
+      return BLOCK {
+        print(factorial(n));
+        print(duplicar(5));
+        print(cambiar(a));
+        print(a);
+        print(suma-local(4));
+        if (0) { print(100) } else { print(200) };
+        if (4) { print(400) } else { print(500) };
+        if (False) { print(1) } else { print(2) };
+        i -> 3;
+        while (i) {
+          print(i);
+          i -> (i - 1)
+        };
+        acc -> 0;
+        for (i -> 1 ; (i < 4) ; i -> (i + 1)) {
+          acc -> (acc + i)
+        };
+        print(acc);
+        switch (n) {
+          case 1 : print(1)
+          case 5 : print(55)
+          default : print(0)
+        };
+        switch (0) {
+          case 1 : print(1)
+          default : print(99)
+        };
+        acc
+      }
+    }
+  }")
+
