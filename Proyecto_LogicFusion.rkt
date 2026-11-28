@@ -946,6 +946,87 @@
 )
 
 ;; =============================================================================
+;; Evaluación del flujo de control.
+;; La idea de la clase: solo se evalúa la rama que toca,
+;; y 0 es falso. Cualquier otro número es verdadero.
+
+;; True lo paso a 1 y False a 0 para usar la misma regla,
+;; porque == y los otros comparadores devuelven bool, no un número.
+(define valor-para-condicion
+  (lambda (val)
+    (cases exp-val val
+      (num-val (n)
+        n)
+      (bool-val (b)
+        (if b 1 0))
+      (else 1))))
+
+(define true-value?
+  (lambda (val)
+    (not (zero? (valor-para-condicion val)))))
+
+(define eval-if
+  (lambda (cond-exp then-exps else-exps env)
+    (if (true-value? (eval-expression cond-exp env))
+        (eval-expression-sequence then-exps env)
+        (eval-expression-sequence else-exps env))))
+
+;; No hay fall-through: en el primer case que coincida se devuelve ese
+;; cuerpo y no se miran los demás. Si ninguno pega, se evalúa el default.
+(define eval-switch
+  (lambda (disc-val clausulas default-exp env)
+    (if (null? clausulas)
+        (eval-expression default-exp env)
+        (cases switch-case (car clausulas)
+          (un-case (exp body)
+            (if (valores-iguales? disc-val (eval-expression exp env))
+                (eval-expression body env)
+                (eval-switch disc-val (cdr clausulas) default-exp env)))))))
+
+(define valores-iguales?
+  (lambda (v1 v2)
+    (cases exp-val v1
+      (num-val (n1)
+        (cases exp-val v2
+          (num-val (n2) (= n1 n2))
+          (else #f)))
+      (bool-val (b1)
+        (cases exp-val v2
+          (bool-val (b2) (eq? b1 b2))
+          (else #f)))
+      (string-val (s1)
+        (cases exp-val v2
+          (string-val (s2) (string=? s1 s2))
+          (else #f)))
+      (else #f))))
+
+;; El while deja el mismo ambiente, si no el i -> (i - 1) se perdería
+;; en la siguiente vuelta. El valor del ciclo es void.
+(define eval-while
+  (lambda (cond-exp body-exps env)
+    (if (true-value? (eval-expression cond-exp env))
+        (begin
+          (eval-expression-sequence body-exps env)
+          (eval-while cond-exp body-exps env))
+        (void-val))))
+
+;; for (inicio; condicion; actualizacion) { cuerpo }
+;; El inicio se hace una vez. La actualización va después del cuerpo.
+(define eval-for
+  (lambda (init-exp cond-exp update-exp body-exps env)
+    (eval-expression init-exp env)
+    (eval-for-loop cond-exp update-exp body-exps env)))
+
+(define eval-for-loop
+  (lambda (cond-exp update-exp body-exps env)
+    (if (true-value? (eval-expression cond-exp env))
+        (begin
+          (eval-expression-sequence body-exps env)
+          (eval-expression update-exp env)
+          (eval-for-loop cond-exp update-exp body-exps env))
+        (void-val))))
+
+;; =============================================================================
 ;; 13. Evaluación de expresiones.
 
 (define eval-expression
