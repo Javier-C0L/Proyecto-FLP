@@ -1354,7 +1354,7 @@
               (i(expval->number (eval-expression pos env))))
             (if (and (integer? i) (>= i 0) (< i (length elemento)))
                      (list-ref elemento i)
-                     (eopl:error 'ref-list "Posicion invalida"
+                     (eopl:error 'ref-list "Posicion invalida: ~s (la lista tiene ~s elementos)"
                                  i (length elemento)))))
               
 
