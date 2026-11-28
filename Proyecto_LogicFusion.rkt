@@ -1310,9 +1310,15 @@
 ;;Listas, Por ahora solo avisan que no estan listasss; : se implemetan despues 
 
       
-      (empty-exp () (eopl:error 'empty "Falta implementacion"))
+      (empty-exp () (list-val'())) ; lista vacia 
+
+      
       (empty?-exp (l) (eopl:error 'empty? "Falta implementacion"))
-      (make-list-exp (args) (eopl:error 'make-list "Falta implementacion"))
+      
+      (make-list-exp (args)
+        (list-val (map (lambda (arg) (eval-expression arg env)) args))) ;Evalua cada elemento y los guarad en una lista
+      
+      
       (list?-exp (x) (eopl:error 'list? "Falta implementacion"))
       (head-exp (l) (eopl:error 'head "Falta implementacion"))
       (tail-exp (l) (eopl:error 'tail "Falta implementacion"))
