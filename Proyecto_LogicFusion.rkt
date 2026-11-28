@@ -824,6 +824,9 @@
 
        (if (= (length params) (length args))
 
+           ;; Paso por valor: cada argumento va a una celda nueva.
+           ;; Si adentro se hace x -> algo, no se modifica la variable
+           ;; de quien llamó. La referencia no se comparte.
            (let ((refs
                   (map
                    (lambda (arg)
