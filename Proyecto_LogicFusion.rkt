@@ -207,9 +207,30 @@
     (expression
       ("print" "(" (separated-list expression ",") ")")
       print-exp)
+   
+
+
+;; =============================================================================
+;; Parte 4 – Yair: Tipos compuestos - Listas inmutables
+;; Este se crea con make-lis poruqe el binario ya contiene el "(".
+;; =============================================================================
+
+;; 1. Listas inmutables
+  (expression ("empty") empty-exp)
+  (expression ("empty?" "(" expression ")") empty?-exp)
+  (expression ("make-list" "(" (separated-list expression  ",") ")") make-list-exp)
+  (expression ("list?" "(" expression ")") list?-exp)
+  (expression ("head" "(" expression ")") head-exp)
+  (expression ("tail" "(" expression ")") tail-exp)
+  (expression ("append" "(" expression "," expression ")") append-exp)
+  (expression ("ref-list" "(" expression "," expression ")") ref-list-exp)
+  (expression ("length" "(" expression ")") length-exp)
+
+  
+
   )
 )
-
+  
 ;; ===========================================================================
 ;; 3. Datatypes y parser (No crear redundancias).
 
@@ -1262,10 +1283,28 @@
          )
        )
       )
+
+      ;; =========================================================================
+;; Parte 4. Yair Tipos compuestos.
+      
+;;Listas, Por ahora solo avisan que no estan listasss; : se implemetan despues 
+
+      
+      (empty-exp () (eopl:error 'empty "Falta implementacion"))
+      (empty?-exp (l) (eopl:error 'empty? "Falta implementacion"))
+      (make-list-exp (args) (eopl:error 'make-list "Falta implementacion"))
+      (list?-exp (x) (eopl:error 'list? "Falta implementacion"))
+      (head-exp (l) (eopl:error 'head "Falta implementacion"))
+      (tail-exp (l) (eopl:error 'tail "Falta implementacion"))
+      (append-exp (l1 l2) (eopl:error 'append "Falta implementacion"))
+      (ref-list-exp (l pos) (eopl:error 'ref-list "Falta implementacion"))
+      (length-exp (l) (eopl:error 'length "Falta implementacion"))
+
+      
     )
   )
 )
-
+ 
 
 ;; =========================================================================
 ;; 14. Evaluación de procedimientos de programa.
@@ -1425,4 +1464,6 @@
       }
     }
   }")
+
+
 
