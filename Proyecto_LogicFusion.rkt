@@ -329,6 +329,14 @@
    (saved-env environment?))
 
   (void-val)
+
+
+  ;;Parte 4- Yair : tipos compuestos
+  ;;Valor de las listas, este lo que hace es guardar los elementos
+  ;;De cualquier exp-val (numero, booleanos, string)
+  ;;Recordar que es inmutable: Ninguna primitiva lo puede cambiar, solo se crena las listas
+
+  (list-val (component (list-of exp-val?)))
 )
 
 
@@ -944,7 +952,7 @@
 ;; 12. Conversión de valores a cadenas.
 
 (define exp-val->string
-  (lambda (val)
+  (lambda (val) 
 
     (cases exp-val val
 
@@ -962,6 +970,18 @@
 
       (void-val ()
         "void")
+
+
+      ;Parte 4 - Yair TIPOS COMPUESTOS
+      ;;Unna lista se muestr a como (0 1 2 3)
+      ;1: map aplica exp-val->string a cada elemento "0" "1"
+      ;2. unir-cvadenas los junta con espacios "0 1"
+      ;;3 string-append le agrega los aprentesis "( 0 1)"
+      
+
+      (list-val (component)
+                (string-append "(" (juntar-textos (map exp-val->string component) " ") ")"))
+      
     )
   )
 )
@@ -1464,6 +1484,21 @@
       }
     }
   }")
+
+;Parte 4 Yair
+;;Tipós compuestos; listas, vecstgores y diccionarios
+;; Lo que realiza es unir una lista de cadenas separandolas entre ellas
+;, si no hay cadena devuelve ""
+;; si hay una sola la devuelve tal cual
+
+
+(define juntar-textos
+  (lambda (cadenas sep)
+    (cond
+      ((null? cadenas) "")
+      ((null? (cdr cadenas)) (car cadenas))
+      (else (string-append (car cadenas) sep
+                           (juntar-textos (cdr cadenas) sep))))))
 
 
 
