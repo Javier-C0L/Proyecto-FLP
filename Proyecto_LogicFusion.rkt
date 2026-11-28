@@ -1269,56 +1269,42 @@
 
 ;; =========================================================================
 ;; 14. Evaluación de procedimientos de programa.
+;;
+;; Primero se reservan todas las celdas y después se guarda la clausura.
+;; El ambiente que queda guardado ya tiene a todos los proc, entonces
+;; uno puede llamarse a sí mismo y también a los otros del PROGRAM
+;; (la misma idea del letrec, con la celda de la clase de asignación).
+
+(define reservar-procs
+  (lambda (decls env)
+    (if (null? decls)
+        env
+        (cases proc-decl (car decls)
+          (proc-header-decl (id params body)
+            (reservar-procs
+             (cdr decls)
+             (extend-env id (vector #f) 'proc #t env)))))))
+
+(define llenar-procs
+  (lambda (decls env)
+    (if (null? decls)
+        env
+        (cases proc-decl (car decls)
+          (proc-header-decl (id params body)
+            (let ((binding (apply-env-ref env id)))
+              (vector-set!
+               (car binding)
+               0
+               (proc-val (get-param-symbols params) body env))
+              (llenar-procs (cdr decls) env)))))))
 
 (define eval-proc-decls
   (lambda (decls env)
-
     (if (null? decls)
-
         env
-
-        (let ((decl
-               (car decls)))
-
-          (let ((new-env
-
-                 (cases proc-decl decl
-
-                   (proc-header-decl
-                    (id params body)
-
-                    (let* ((param-syms
-                            (get-param-symbols params))
-
-                           (ref
-                            (vector #f))
-
-                           (recursive-env
-                            (extend-env
-                             id ref 'proc #t env))
-
-                           (proc
-                            (proc-val
-                             param-syms
-                             body
-                             recursive-env)))
-
-                      (vector-set! ref 0 proc)
-
-                      recursive-env
-                    )
-                   )
-                 )
-               ))
-
-            (eval-proc-decls
-             (cdr decls)
-             new-env)
-          )
-        )
-    )
-  )
-)
+        (let ((new-env (reservar-procs decls env)))
+          (llenar-procs decls new-env)
+          new-env))))
 
 
 ;; =============================================================================
