@@ -1313,18 +1313,53 @@
       (empty-exp () (list-val'())) ; lista vacia 
 
       
-      (empty?-exp (l) (eopl:error 'empty? "Falta implementacion"))
+      (empty?-exp (l)
+           (bool-val (null?
+              (expval->lista (eval-expression l env)'empty?)))) ;;Tru si la losta no tiene elementois 
       
       (make-list-exp (args)
         (list-val (map (lambda (arg) (eval-expression arg env)) args))) ;Evalua cada elemento y los guarad en una lista
       
       
-      (list?-exp (x) (eopl:error 'list? "Falta implementacion"))
-      (head-exp (l) (eopl:error 'head "Falta implementacion"))
-      (tail-exp (l) (eopl:error 'tail "Falta implementacion"))
-      (append-exp (l1 l2) (eopl:error 'append "Falta implementacion"))
-      (ref-list-exp (l pos) (eopl:error 'ref-list "Falta implementacion"))
-      (length-exp (l) (eopl:error 'length "Falta implementacion"))
+      (list?-exp (li)
+           (cases exp-val (eval-expression li env)
+             (list-val (component) (bool-val #t))
+             (else (bool-val #f))))  ; True si li es una lista ,  false sino
+
+      
+      (head-exp (l)
+                (let ((elemento (expval->lista (eval-expression l env) 'head)))
+                  (if(null? elemento)
+                   (eopl:error 'head "La lista esta vacia")
+                    (car elemento)))) ; Pimer elemento y si esta vacia da error y mensaje
+
+      
+      (tail-exp (l)
+                (let ((elemento (expval->lista (eval-expression l env) 'tail)))
+                  (if(null? elemento)
+                   (eopl:error 'tail "La lista esta vacia")
+                    (list-val (cdr elemento ))))) ; Lista sin elprimer elemento solo elresto cdr
+      
+
+
+                    
+      (append-exp (l1 l2) ; Crea una lista Nueva con L1 y depsues l2 
+                  (list-val
+                  (append (expval->lista (eval-expression l1 env) 'append)
+                          (expval->lista (eval-expression l2 env) 'append))))
+
+      
+      (ref-list-exp (l pos);el elemento en laposicion (pos) este empieza en '0
+            (let ((elemento (expval->lista (eval-expression l env) 'ref-list))
+              (i(expval->number (eval-expression pos env))))
+            (if (and (integer? i) (>= i 0) (< i (length elemento)))
+                     (list-ref elemento i)
+                     (eopl:error 'ref-list "Posicion invalida"
+                                 i (length elemento)))))
+              
+
+      (length-exp (l)
+               (num-val (length (expval->lista (eval-expression l env)'length))))
 
       
     )
@@ -1505,6 +1540,16 @@
       ((null? (cdr cadenas)) (car cadenas))
       (else (string-append (car cadenas) sep
                            (juntar-textos (cdr cadenas) sep))))))
+
+;Quitaremos los textos u elementos de una lita de LogicFusion
+;Si este valor no esuna losta,lanza un error econ el nombre dado en la primitiva
+
+(define expval->lista
+  (lambda (val nombre)
+    (cases exp-val val
+      (list-val (component) component)
+      (else (eopl:error nombre "Se esperaba una lista y el resultado fue : ~s"
+                        (exp-val->string val))))))
 
 
 
