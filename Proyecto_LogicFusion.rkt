@@ -1119,6 +1119,60 @@
         env)
       )
 
+      ;; -----------------------------------------------------------------------
+      ;; if / switch / while / for
+
+      (if-exp
+       (cond-exp then-exp then-rest else-exp else-rest)
+
+       (eval-if
+        cond-exp
+        (cons then-exp then-rest)
+        (cons else-exp else-rest)
+        env)
+      )
+
+      (switch-exp
+       (disc-exp clausulas def)
+
+       (let ((disc-val (eval-expression disc-exp env)))
+         (cases switch-default def
+           (un-default (default-exp)
+             (eval-switch disc-val clausulas default-exp env))))
+      )
+
+      (while-exp
+       (cond-exp first-exp rest-exps)
+
+       (eval-while
+        cond-exp
+        (cons first-exp rest-exps)
+        env)
+      )
+
+      (for-exp
+       (init-exp cond-exp update-exp first-exp rest-exps)
+
+       (eval-for
+        init-exp
+        cond-exp
+        update-exp
+        (cons first-exp rest-exps)
+        env)
+      )
+
+      ;; lambda suelto: clausura con el ambiente de ahora.
+      ;; La recursión con nombre queda en los proc, porque ahí
+      ;; la celda se llena después de armar el ambiente.
+      (lambda-exp
+       (params body)
+
+       (proc-val
+        (get-param-symbols params)
+        body
+        env)
+      )
+
 
       ;; -----------------------------------------------------------------------
       ;; Operaciones aritméticas y relacionales (OJO CON LOS SÍMBOLOS).
