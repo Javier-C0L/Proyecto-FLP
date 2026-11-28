@@ -299,8 +299,11 @@
   (string-val
    (val string?))
 
+  ;; El proc es un valor expresado.
+  ;; Guardo los nombres de los parámetros (si guardo el param-decl, truena)
+  ;; y el ambiente donde se creó, para que quede la clausura.
   (proc-val
-   (params (list-of param-decl?))  ;; Me apareció error, revisar.
+   (params (list-of symbol?))
    (body expression?)
    (saved-env environment?))
 
