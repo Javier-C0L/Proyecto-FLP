@@ -136,6 +136,56 @@
        "}")
       locals-exp)
 
+    ;; Estructuras de control.
+    ;; if siempre lleva else. switch siempre lleva default.
+    ;;
+    ;; if (cond) { exp; exp } else { exp }
+    ;; switch (exp) { case exp : exp default : exp }
+    ;; while (cond) { exp; exp }
+    ;; for (inicio; cond; actualizacion) { exp }
+    ;; lambda (tipo nombre, ...) { return exp }
+
+    (expression
+      ("if" "(" expression ")" "{"
+       expression (arbno ";" expression)
+       "}" "else" "{"
+       expression (arbno ";" expression)
+       "}")
+      if-exp)
+
+    (expression
+      ("switch" "(" expression ")" "{"
+       (arbno switch-case)
+       switch-default
+       "}")
+      switch-exp)
+
+    (switch-case
+      ("case" expression ":" expression)
+      un-case)
+
+    (switch-default
+      ("default" ":" expression)
+      un-default)
+
+    (expression
+      ("while" "(" expression ")" "{"
+       expression (arbno ";" expression)
+       "}")
+      while-exp)
+
+    (expression
+      ("for" "(" expression ";" expression ";" expression ")" "{"
+       expression (arbno ";" expression)
+       "}")
+      for-exp)
+
+    ;; lambda como expresión. Así el procedimiento es un valor.
+    (expression
+      ("lambda" "(" (separated-list param-decl ",") ")"
+       "{" "return" expression "}")
+      lambda-exp)
+
     ;; Operadores binarios. 
     ;; Si, por x o y razón, hay que manipular la estructura, avisar al grupo entero.
 
